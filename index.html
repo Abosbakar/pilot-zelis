@@ -93,7 +93,7 @@ AGENT_SECIMLERI = [
 # Oyun Durumu
 mevcut_ikilem_indexi = 0
 oyuncu_secimleri = []
-game_area = Element("game_area") # PyScript DOM elementine erişim
+game_area = Element("game_area") 
 
 def display_ikilem(index):
     """Mevcut ikilemi ekranda gösterir."""
@@ -107,7 +107,6 @@ def display_ikilem(index):
     soru_metni = f"<h2>İkilem {index + 1}/{len(IKILEM_LISTESI)}: {secenek_1} mı, {secenek_2} mı?</h2>"
     
     # Seçeneklerin HTML'ini oluştur
-    # py-click çağrısı ile record_choice fonksiyonuna seçimi gönderiyoruz.
     button_1 = f'<button id="btn1" py-click="record_choice(\'{secenek_1}\')">{secenek_1}</button>'
     button_2 = f'<button id="btn2" py-click="record_choice(\'{secenek_2}\')">{secenek_2}</button>'
     
@@ -129,7 +128,7 @@ def record_choice(secim):
 
 
 def display_results():
-    """Tartışma odaklı final ekranını gösterir. Tırnak işaretleri düzeltildi."""
+    """Tartışma odaklı final ekranını gösterir. Tırnak işaretleri kesinlikle düzeltildi."""
     
     tartisma_konulari = []
     uyum_sayisi = 0
