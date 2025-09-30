@@ -4,180 +4,182 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>İdeoloji Uyum Testi</title>
-    <link rel="stylesheet" href="https://pyscript.net/releases/2024.1.1/core.css">
-    <script type="module" src="https://pyscript.net/releases/2024.1.1/core.js"></script>
-
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f9;
-            color: #333;
-            margin: 0;
+            /* Randevu sistemi stilinden ilham alındı */
+            background: linear-gradient(to right, #fce4ec, #f8bbd0); 
+            font-family: 'Segoe UI', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             padding: 20px;
-            text-align: center;
         }
         .container {
-            max-width: 600px;
-            margin: 0 auto;
+            max-width: 650px;
             background-color: #fff;
             padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+            animation: fadeIn 0.8s ease-in-out;
         }
-        h1 { color: #0066cc; margin-bottom: 20px; }
-        h2 { color: #555; font-size: 1.2em; margin-top: 25px; }
-        button {
-            background-color: #0066cc;
+        h1 { color: #e91e63; }
+        .btn-choice {
+            background-color: #008cba;
             color: white;
             border: none;
-            padding: 10px 20px;
-            margin: 5px;
+            padding: 12px 25px;
+            margin: 10px;
             cursor: pointer;
-            border-radius: 5px;
-            transition: background-color 0.3s;
+            border-radius: 8px;
+            transition: transform 0.2s, background-color 0.2s;
+            font-size: 1.1em;
         }
-        button:hover {
-            background-color: #0056b3;
+        .btn-choice:hover {
+            background-color: #007bb5;
+            transform: scale(1.05);
         }
         .result-item {
-            text-align: left;
+            border-left: 5px solid #ff9800;
+            background-color: #fff3e0;
+            padding: 15px;
             margin-bottom: 15px;
-            padding: 10px;
-            border-left: 4px solid #f39c12;
-            background-color: #fafafa;
+            border-radius: 5px;
         }
-        .result-question { font-weight: bold; color: #e67e22; }
-        .result-choice { font-style: italic; color: #2c3e50; }
+        .result-item strong {
+            color: #d84315;
+        }
+        .result-item span {
+            color: #1e88e5;
+            font-weight: 500;
+        }
+        @keyframes fadeIn {
+            from {opacity: 0;}
+            to {opacity: 1;}
+        }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h1>İdeoloji Uyum Testi</h1>
-    <p>Yarın yazmak için bahane bulma görevini ciddiye aldım! Bu testi bitir ve çıkan sonuçları bana at. 😉</p>
+<div class="container text-center">
+    <h1 class="mb-4">İdeoloji Uyum Testi</h1>
+    <p class="mb-4">Yarın yazmak için bahane bulma görevini ciddiye aldım! Testi bitir ve sonuç ekranının fotoğrafını bana at. 😉</p>
     
-    <div id="game_area">
+    <div id="gameArea" class="mt-4">
         <p>Yükleniyor...</p>
     </div>
 </div>
 
-<py-script>
-# --- PYTHON KODU BAŞLANGIÇ ---
+<script>
+    // --- JavaScript Kodu Başlangıç ---
 
-# Kullanıcının Sağladığı İkilemler Listesi
-IKILEM_LISTESI = [
-    ("RECEP TAYYİP ERDOĞAN", "MELİH GÖKÇEK"),
-    ("Çay", "Kahve"),
-    ("Beşiktaş", "Fenerbahçe"),
-    ("Karadeniz", "Ege"),
-    ("iPhone", "Samsung"),
-    ("Yurt Dışında Yaşamak", "Türkiye'de Yaşamak"),
-    ("Barış Manço", "Sezen Aksu"),
-    ("Zeki Demirkubuz", "Nuri Bilge Ceylan"),
-    ("İlk mesajda 'Şizofren misin' yazmak", "Takipten çıkarılınca mesaj atmak"),
-]
+    // Kullanıcının Sağladığı İkilemler Listesi
+    const IKILEM_LISTESI = [
+        ["RECEP TAYYİP ERDOĞAN", "MELİH GÖKÇEK"],
+        ["Çay", "Kahve"],
+        ["Beşiktaş", "Fenerbahçe"],
+        ["Karadeniz", "Ege"],
+        ["iPhone", "Samsung"],
+        ["Yurt Dışında Yaşamak", "Türkiye'de Yaşamak"],
+        ["Barış Manço", "Sezen Aksu"],
+        ["Zeki Demirkubuz", "Nuri Bilge Ceylan"],
+        ["İlk mesajda 'Şizofren misin' yazmak", "Takipten çıkarılınca mesaj atmak"],
+    ];
 
-# AJANIN TERCİHLERİ
-AGENT_SECIMLERI = [
-    "RECEP TAYYİP ERDOĞAN",
-    "Çay",
-    "Beşiktaş",
-    "Karadeniz",
-    "Samsung",
-    "Türkiye'de Yaşamak",
-    "Barış Manço",
-    "Zeki Demirkubuz",
-    "İlk mesajda 'Şizofren misin' yazmak"
-]
+    // AJANIN TERCİHLERİ (Bana Ait Olan Cevaplar)
+    const AGENT_SECIMLERI = [
+        "RECEP TAYYİP ERDOĞAN",
+        "Çay",
+        "Beşiktaş",
+        "Karadeniz",
+        "Samsung",
+        "Türkiye'de Yaşamak",
+        "Barış Manço",
+        "Zeki Demirkubuz",
+        "İlk mesajda 'Şizofren misin' yazmak"
+    ];
 
-# Oyun Durumu
-mevcut_ikilem_indexi = 0
-oyuncu_secimleri = []
-game_area = Element("game_area") 
+    let currentIkilemIndex = 0;
+    const playerChoices = [];
+    const gameArea = document.getElementById('gameArea');
 
-def display_ikilem(index):
-    """Mevcut ikilemi ekranda gösterir."""
-    if index >= len(IKILEM_LISTESI):
-        display_results()
-        return
+    function displayIkilem(index) {
+        if (index >= IKILEM_LISTESI.length) {
+            displayResults();
+            return;
+        }
 
-    secenek_1 = IKILEM_LISTESI[index][0]
-    secenek_2 = IKILEM_LISTESI[index][1]
-    
-    soru_metni = f"<h2>İkilem {index + 1}/{len(IKILEM_LISTESI)}: {secenek_1} mı, {secenek_2} mı?</h2>"
-    
-    # Seçeneklerin HTML'ini oluştur
-    button_1 = f'<button id="btn1" py-click="record_choice(\'{secenek_1}\')">{secenek_1}</button>'
-    button_2 = f'<button id="btn2" py-click="record_choice(\'{secenek_2}\')">{secenek_2}</button>'
-    
-    game_area.element.innerHTML = soru_metni + button_1 + button_2
+        const [secenek1, secenek2] = IKILEM_LISTESI[index];
+        
+        const content = `
+            <h4 class="mb-4">İkilem ${index + 1}/${IKILEM_LISTESI.length}:</h4>
+            <h3 class="mb-4">${secenek1} mı, ${secenek2} mı?</h3>
+            <button class="btn-choice btn-lg" onclick="recordChoice('${secenek1}')">${secenek1}</button>
+            <button class="btn-choice btn-lg" onclick="recordChoice('${secenek2}')">${secenek2}</button>
+        `;
+        gameArea.innerHTML = content;
+    }
 
+    window.recordChoice = function(secim) {
+        playerChoices.push({
+            index: currentIkilemIndex,
+            cevap: secim
+        });
+        currentIkilemIndex++;
+        displayIkilem(currentIkilemIndex);
+    }
 
-def record_choice(secim):
-    """Kullanıcının seçimini kaydeder ve bir sonraki ikileme geçer."""
-    global mevcut_ikilem_indexi
-    
-    # Seçimi kaydet
-    oyuncu_secimleri.append({
-        'index': mevcut_ikilem_indexi,
-        'cevap': secim
-    })
-    
-    mevcut_ikilem_indexi += 1
-    display_ikilem(mevcut_ikilem_indexi)
+    function displayResults() {
+        const tartismaKonulari = [];
+        let uyumSayisi = 0;
 
+        playerChoices.forEach(secim => {
+            const agentSecimi = AGENT_SECIMLERI[secim.index];
+            if (secim.cevap === agentSecimi) {
+                uyumSayisi++;
+            } else {
+                const [secenek1, secenek2] = IKILEM_LISTESI[secim.index];
+                tartismaKonulari.push({
+                    soru: `${secenek1} vs ${secenek2}`,
+                    senin: secim.cevap,
+                    benim: agentSecimi
+                });
+            }
+        });
 
-def display_results():
-    """Tartışma odaklı final ekranını gösterir. String yapısı güçlendirildi."""
-    
-    tartisma_konulari = []
-    uyum_sayisi = 0
-    
-    # Seçimleri Karşılaştır
-    for secim in oyuncu_secimleri:
-        agent_secimi = AGENT_SECIMLERI[secim['index']]
-        if secim['cevap'] == agent_secimi:
-            uyum_sayisi += 1
-        else:
-            # Uyumsuzluk durumunda tartışma konusunu kaydet
-            soru = IKILEM_LISTESI[secim['index']]
-            tartisma_konulari.append({
-                'soru': f"{soru[0]} vs {soru[1]}",
-                'senin': secim['cevap'],
-                'benim': agent_secimi
-            })
+        let resultHTML = `<h2 class="text-danger mb-4">İdeoloji Analizi Sonuçları</h2>`;
+        
+        if (tartismaKonulari.length > 0) {
+            resultHTML += `<h4 class="text-dark">Farklı Düşündüğümüz Konular (Tartışmaya Açık!):</h4><div class="mt-3 text-start">`;
             
-    # Sonuçların HTML'ini oluştur
-    if tartisma_konulari:
-        result_html = "<h2>Farklı Düşündüğümüz Konular (Tartışmaya Açık!):</h2>"
-        result_html += "<p>Hadi bu konuları konuşalım:</p>"
-        
-        for konu in tartisma_konulari:
-            # HTML String'leri Güvenli Şekilde Birleştiriliyor
-            result_html += (
-                "<div class='result-item'>" +
-                f"<p class='result-question'>{konu['soru']}</p>" +
-                f"<p>Senin Seçimin: <span class='result-choice'>{konu['senin']}</span></p>" +
-                f"<p>Benim Seçimim: <span class='result-choice'>{konu['benim']}</span></p>" +
-                "</div>"
-            )
-        
-    else:
-        result_html = "<h2>Tebrikler! Her Konuda Anlaşıyoruz!</h2>"
-        result_html += "<p>Hiç tartışma konumuz yok. Mükemmel bir uyum!</p>"
+            tartismaKonulari.forEach(konu => {
+                resultHTML += `
+                    <div class="result-item">
+                        <strong>${konu.soru}</strong><br>
+                        Senin Seçimin: <span>${konu.senin}</span><br>
+                        Benim Seçimim: <span>${konu.benim}</span>
+                    </div>
+                `;
+            });
+            resultHTML += `</div>`;
+        } else {
+            resultHTML += `<h4 class="text-success mb-5">Tebrikler! Her Konuda Anlaşıyoruz!</h4>`;
+        }
 
-    
-    # Final Mesajı (Stil Bilgisi Direkt String Olarak Tanımlanıyor)
-    final_message = ("<p style='margin-top:20px; color:#1abc9c; font-weight:bold;'>" +
-                     f"Toplam Uyum Sayımız: {uyum_sayisi} / {len(IKILEM_LISTESI)}</p>")
-    final_message += "<p style='margin-top:30px;'>Bu ekranın fotoğrafını çekip bana gönder. Hadi tartışmaya başlayalım! 😉</p>"
-    
-    game_area.element.innerHTML = result_html + final_message
+        resultHTML += `
+            <p class="mt-5 fs-5 fw-bold text-primary">Toplam Uyum Sayımız: ${uyumSayisi} / ${IKILEM_LISTESI.length}</p>
+            <p class="fs-6 mt-4">Bu ekranın fotoğrafını çekip bana göndermeyi unutma! Hadi tartışmaya başlayalım. 😉</p>
+        `;
 
-# Oyunu başlat
-display_ikilem(mevcut_ikilem_indexi)
+        gameArea.innerHTML = resultHTML;
+    }
 
-# --- PYTHON KODU SONUÇ ---
-</py-script>
+    // Oyunu başlat
+    displayIkilem(currentIkilemIndex);
+
+    // --- JavaScript Kodu Son ---
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
