@@ -1,16 +1,13 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>İdeoloji Uyum Testi</title>
-
-    <!-- PyScript -->
-    <link rel="stylesheet" href="https://pyscript.net/releases/2024.1.1/core.css" />
+    <link rel="stylesheet" href="https://pyscript.net/releases/2024.1.1/core.css">
     <script type="module" src="https://pyscript.net/releases/2024.1.1/core.js"></script>
 
     <style>
-        :root { color-scheme: light; }
         body {
             font-family: Arial, sans-serif;
             background-color: #f4f4f9;
@@ -20,217 +17,167 @@
             text-align: center;
         }
         .container {
-            max-width: 640px;
+            max-width: 600px;
             margin: 0 auto;
             background-color: #fff;
             padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
         }
-        h1 { color: #0066cc; margin-bottom: 16px; }
-        h2 { color: #555; font-size: 1.2em; margin: 24px 0 12px; }
-        .btn-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-top: 10px;
-        }
+        h1 { color: #0066cc; margin-bottom: 20px; }
+        h2 { color: #555; font-size: 1.2em; margin-top: 25px; }
         button {
             background-color: #0066cc;
-            color: #fff;
+            color: white;
             border: none;
-            padding: 12px 16px;
+            padding: 10px 20px;
+            margin: 5px;
             cursor: pointer;
-            border-radius: 8px;
-            transition: transform 0.05s ease, background-color 0.2s ease;
-            font-size: 1rem;
+            border-radius: 5px;
+            transition: background-color 0.3s;
         }
-        button:hover { background-color: #0056b3; }
-        button:active { transform: scale(0.98); }
-        .muted { color: #666; font-size: 0.95rem; }
+        button:hover {
+            background-color: #0056b3;
+        }
         .result-item {
             text-align: left;
             margin-bottom: 15px;
             padding: 10px;
             border-left: 4px solid #f39c12;
             background-color: #fafafa;
-            border-radius: 6px;
         }
         .result-question { font-weight: bold; color: #e67e22; }
         .result-choice { font-style: italic; color: #2c3e50; }
-        .footer-note { margin-top: 30px; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>İdeoloji Uyum Testi</h1>
-        <p class="muted">Yarın yazmak için bahane bulma görevini ciddiye aldım! Bu testi bitir ve çıkan sonuçları bana at. 😉</p>
 
-        <div id="game_area">
-            <!-- Başlangıçta statik iskelet; PyScript sadece içerikleri güncelleyecek -->
-            <div id="question_box">
-                <h2 id="question_text">Yükleniyor…</h2>
-                <div class="btn-row" id="choices_row" style="display:none;">
-                    <button id="btn_left" py-click="record_choice('left')">Seçenek 1</button>
-                    <button id="btn_right" py-click="record_choice('right')">Seçenek 2</button>
-                </div>
-                <p id="progress_text" class="muted"></p>
-            </div>
-            <div id="results_box" style="display:none;"></div>
-        </div>
+<div class="container">
+    <h1>İdeoloji Uyum Testi</h1>
+    <p>Yarın yazmak için bahane bulma görevini ciddiye aldım! Bu testi bitir ve çıkan sonuçları bana at. 😉</p>
+    
+    <div id="game_area">
+        <p>Yükleniyor...</p>
     </div>
+</div>
 
 <py-script>
 # --- PYTHON KODU BAŞLANGIÇ ---
 
-from pyscript import Element
-
 # Kullanıcının Sağladığı İkilemler Listesi
 IKILEM_LISTESI = [
-    ('RECEP TAYYİP ERDOĞAN', 'MELİH GÖKÇEK'),
-    ('Çay', 'Kahve'),
-    ('Beşiktaş', 'Fenerbahçe'),
-    ('Karadeniz', 'Ege'),
-    ('iPhone', 'Samsung'),
+    ("RECEP TAYYİP ERDOĞAN", "MELİH GÖKÇEK"),
+    ("Çay", "Kahve"),
+    ("Beşiktaş", "Fenerbahçe"),
+    ("Karadeniz", "Ege"),
+    ("iPhone", "Samsung"),
     ("Yurt Dışında Yaşamak", "Türkiye'de Yaşamak"),
-    ('Barış Manço', 'Sezen Aksu'),
-    ('Zeki Demirkubuz', 'Nuri Bilge Ceylan'),
-    ("İlk mesajda 'Şizofren misin' yazmak", 'Takipten çıkarılınca mesaj atmak'),
+    ("Barış Manço", "Sezen Aksu"),
+    ("Zeki Demirkubuz", "Nuri Bilge Ceylan"),
+    ("İlk mesajda 'Şizofren misin' yazmak", "Takipten çıkarılınca mesaj atmak"),
 ]
 
-# AJANIN TERCİHLERİ (sırayla IKILEM_LISTESI ile hizalı)
+# AJANIN TERCİHLERİ
 AGENT_SECIMLERI = [
-    'RECEP TAYYİP ERDOĞAN',
-    'Çay',
-    'Beşiktaş',
-    'Karadeniz',
-    'Samsung',
+    "RECEP TAYYİP ERDOĞAN",
+    "Çay",
+    "Beşiktaş",
+    "Karadeniz",
+    "Samsung",
     "Türkiye'de Yaşamak",
-    'Barış Manço',
-    'Zeki Demirkubuz',
-    "İlk mesajda 'Şizofren misin' yazmak",
+    "Barış Manço",
+    "Zeki Demirkubuz",
+    "İlk mesajda 'Şizofren misin' yazmak"
 ]
 
 # Oyun Durumu
 mevcut_ikilem_indexi = 0
-oyuncu_secimleri = []  # {'index': int, 'cevap': str}
-current_left = None
-current_right = None
+oyuncu_secimleri = []
+game_area = Element("game_area") 
 
-# DOM Elemanları
-question_text_el = Element('question_text')
-progress_text_el = Element('progress_text')
-choices_row_el = Element('choices_row')
-btn_left_el = Element('btn_left')
-btn_right_el = Element('btn_right')
-results_box_el = Element('results_box')
-game_area_el = Element('game_area')
-
-def _set_question_text(html_str: str):
-    # Güvenli: yalnızca bizim ürettiğimiz içerik
-    question_text_el.element.innerHTML = html_str
-
-def _set_button_texts(left_text: str, right_text: str):
-    btn_left_el.element.textContent = left_text
-    btn_right_el.element.textContent = right_text
-
-def _set_progress(i: int, total: int):
-    progress_text_el.element.textContent = f'İlerleme: {i}/{total}'
-
-def display_ikilem(index: int):
-    """Mevcut ikilemi ekranda gösterir (statik butonlar üzerinden)."""
-    global current_left, current_right
-
-    total = len(IKILEM_LISTESI)
-    if index >= total:
+def display_ikilem(index):
+    """Mevcut ikilemi ekranda gösterir."""
+    if index >= len(IKILEM_LISTESI):
         display_results()
         return
 
-    current_left, current_right = IKILEM_LISTESI[index]
+    secenek_1 = IKILEM_LISTESI[index][0]
+    secenek_2 = IKILEM_LISTESI[index][1]
+    
+    soru_metni = f"<h2>İkilem {index + 1}/{len(IKILEM_LISTESI)}: {secenek_1} mı, {secenek_2} mı?</h2>"
+    
+    # Seçeneklerin HTML'ini oluştur
+    button_1 = f'<button id="btn1" py-click="record_choice(\'{secenek_1}\')">{secenek_1}</button>'
+    button_2 = f'<button id="btn2" py-click="record_choice(\'{secenek_2}\')">{secenek_2}</button>'
+    
+    game_area.element.innerHTML = soru_metni + button_1 + button_2
 
-    # Soru başlığı
-    _set_question_text(
-        f"<h2>İkilem {index + 1}/{total}: {current_left} mı, {current_right} mı?</h2>"
-    )
 
-    # Butonları ve ilerlemeyi güncelle
-    _set_button_texts(current_left, current_right)
-    _set_progress(index, total)
-
-    # Görünürlük
-    choices_row_el.element.style.display = 'grid'
-    results_box_el.element.style.display = 'none'
-
-def record_choice(side: str):
+def record_choice(secim):
     """Kullanıcının seçimini kaydeder ve bir sonraki ikileme geçer."""
-    global mevcut_ikilem_indexi, current_left, current_right
-
-    if side == 'left':
-        cevap = current_left
-    else:
-        cevap = current_right
-
+    global mevcut_ikilem_indexi
+    
+    # Seçimi kaydet
     oyuncu_secimleri.append({
         'index': mevcut_ikilem_indexi,
-        'cevap': cevap
+        'cevap': secim
     })
-
+    
     mevcut_ikilem_indexi += 1
     display_ikilem(mevcut_ikilem_indexi)
 
+
 def display_results():
-    """Tartışma odaklı final ekranını gösterir."""
+    """Tartışma odaklı final ekranını gösterir. String yapısı güçlendirildi."""
+    
     tartisma_konulari = []
     uyum_sayisi = 0
-
+    
+    # Seçimleri Karşılaştır
     for secim in oyuncu_secimleri:
         agent_secimi = AGENT_SECIMLERI[secim['index']]
         if secim['cevap'] == agent_secimi:
             uyum_sayisi += 1
         else:
+            # Uyumsuzluk durumunda tartışma konusunu kaydet
             soru = IKILEM_LISTESI[secim['index']]
             tartisma_konulari.append({
-                'soru': f'{soru[0]} vs {soru[1]}',
+                'soru': f"{soru[0]} vs {soru[1]}",
                 'senin': secim['cevap'],
                 'benim': agent_secimi
             })
-
+            
+    # Sonuçların HTML'ini oluştur
     if tartisma_konulari:
-        result_html = '<h2>Farklı Düşündüğümüz Konular (Tartışmaya Açık!):</h2>'
-        result_html += '<p>Hadi bu konuları konuşalım:</p>'
+        result_html = "<h2>Farklı Düşündüğümüz Konular (Tartışmaya Açık!):</h2>"
+        result_html += "<p>Hadi bu konuları konuşalım:</p>"
+        
         for konu in tartisma_konulari:
+            # HTML String'leri Güvenli Şekilde Birleştiriliyor
             result_html += (
-                "<div class='result-item'>"
-                f"<p class='result-question'>{konu['soru']}</p>"
-                f"<p>Senin Seçimin: <span class='result-choice'>{konu['senin']}</span></p>"
-                f"<p>Benim Seçimim: <span class='result-choice'>{konu['benim']}</span></p>"
+                "<div class='result-item'>" +
+                f"<p class='result-question'>{konu['soru']}</p>" +
+                f"<p>Senin Seçimin: <span class='result-choice'>{konu['senin']}</span></p>" +
+                f"<p>Benim Seçimim: <span class='result-choice'>{konu['benim']}</span></p>" +
                 "</div>"
             )
+        
     else:
-        result_html = '<h2>Tebrikler! Her Konuda Anlaşıyoruz!</h2>'
-        result_html += '<p>Hiç tartışma konumuz yok. Mükemmel bir uyum!</p>'
+        result_html = "<h2>Tebrikler! Her Konuda Anlaşıyoruz!</h2>"
+        result_html += "<p>Hiç tartışma konumuz yok. Mükemmel bir uyum!</p>"
 
-    # Uyum sayısı ve kapanış mesajı (tırnaklar güvenli)
-    final_message = (
-        f"<p style='margin-top:20px; color:#1abc9c; font-weight:bold;'>"
-        f"Toplam Uyum Sayımız: {uyum_sayisi} / {len(IKILEM_LISTESI)}"
-        f"</p>"
-        "<p class='footer-note'>Bu ekranın fotoğrafını çekip bana gönder. "
-        "Hadi tartışmaya başlayalım! 😉</p>"
-    )
-
-    results_box_el.element.innerHTML = result_html + final_message
-
-    # Görünürlük: sonuç ekranı açık, seçim butonları kapalı
-    results_box_el.element.style.display = 'block'
-    choices_row_el.element.style.display = 'none'
-    _set_question_text('<h2>Sonuçlar</h2>')
-    _set_progress(len(IKILEM_LISTESI), len(IKILEM_LISTESI))
+    
+    # Final Mesajı (Stil Bilgisi Direkt String Olarak Tanımlanıyor)
+    final_message = ("<p style='margin-top:20px; color:#1abc9c; font-weight:bold;'>" +
+                     f"Toplam Uyum Sayımız: {uyum_sayisi} / {len(IKILEM_LISTESI)}</p>")
+    final_message += "<p style='margin-top:30px;'>Bu ekranın fotoğrafını çekip bana gönder. Hadi tartışmaya başlayalım! 😉</p>"
+    
+    game_area.element.innerHTML = result_html + final_message
 
 # Oyunu başlat
 display_ikilem(mevcut_ikilem_indexi)
 
-# --- PYTHON KODU SONU ---
+# --- PYTHON KODU SONUÇ ---
 </py-script>
 </body>
 </html>
