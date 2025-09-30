@@ -93,7 +93,7 @@ AGENT_SECIMLERI = [
 # Oyun Durumu
 mevcut_ikilem_indexi = 0
 oyuncu_secimleri = []
-game_area = Element("game_area")
+game_area = Element("game_area") # PyScript DOM elementine erişim
 
 def display_ikilem(index):
     """Mevcut ikilemi ekranda gösterir."""
@@ -107,6 +107,7 @@ def display_ikilem(index):
     soru_metni = f"<h2>İkilem {index + 1}/{len(IKILEM_LISTESI)}: {secenek_1} mı, {secenek_2} mı?</h2>"
     
     # Seçeneklerin HTML'ini oluştur
+    # py-click çağrısı ile record_choice fonksiyonuna seçimi gönderiyoruz.
     button_1 = f'<button id="btn1" py-click="record_choice(\'{secenek_1}\')">{secenek_1}</button>'
     button_2 = f'<button id="btn2" py-click="record_choice(\'{secenek_2}\')">{secenek_2}</button>'
     
@@ -128,7 +129,7 @@ def record_choice(secim):
 
 
 def display_results():
-    """Tartışma odaklı final ekranını gösterir."""
+    """Tartışma odaklı final ekranını gösterir. Tırnak işaretleri düzeltildi."""
     
     tartisma_konulari = []
     uyum_sayisi = 0
@@ -153,11 +154,12 @@ def display_results():
         result_html += "<p>Hadi bu konuları konuşalım:</p>"
         
         for konu in tartisma_konulari:
+            # DÜZELTME: Tüm HTML nitelikleri tek tırnak (') ile kullanıldı.
             result_html += f"""
-            <div class="result-item">
-                <p class="result-question">{konu['soru']}</p>
-                <p>Senin Seçimin: <span class="result-choice">{konu['senin']}</span></p>
-                <p>Benim Seçimim: <span class="result-choice">{konu['benim']}</span></p>
+            <div class='result-item'>
+                <p class='result-question'>{konu['soru']}</p>
+                <p>Senin Seçimin: <span class='result-choice'>{konu['senin']}</span></p>
+                <p>Benim Seçimim: <span class='result-choice'>{konu['benim']}</span></p>
             </div>
             """
         
@@ -166,7 +168,7 @@ def display_results():
         result_html += "<p>Hiç tartışma konumuz yok. Mükemmel bir uyum!</p>"
 
     
-    # Final Mesajı
+    # Final Mesajı (DÜZELTME: Stil içindeki çift tırnaklar tek tırnak oldu)
     final_message = f"<p style='margin-top:20px; color:#1abc9c; font-weight:bold;'>Toplam Uyum Sayımız: {uyum_sayisi} / {len(IKILEM_LISTESI)}</p>"
     final_message += "<p style='margin-top:30px;'>Bu ekranın fotoğrafını çekip bana gönder. Hadi tartışmaya başlayalım! 😉</p>"
     
