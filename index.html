@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>İdeoloji Uyum Testi</title>
+    <link rel="stylesheet" href="https://pyscript.net/releases/2024.1.1/core.css">
+    <script type="module" src="https://pyscript.net/releases/2024.1.1/core.js"></script>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+            text-align: center;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 { color: #0066cc; margin-bottom: 20px; }
+        h2 { color: #555; font-size: 1.2em; margin-top: 25px; }
+        button {
+            background-color: #0066cc;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 5px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .result-item {
+            text-align: left;
+            margin-bottom: 15px;
+            padding: 10px;
+            border-left: 4px solid #f39c12;
+            background-color: #fafafa;
+        }
+        .result-question { font-weight: bold; color: #e67e22; }
+        .result-choice { font-style: italic; color: #2c3e50; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>İdeoloji Uyum Testi</h1>
+    <p>Yarın yazmak için bahane bulma görevini ciddiye aldım! Bu testi bitir ve çıkan sonuçları bana at. 😉</p>
+    
+    <div id="game_area">
+        <p>Yükleniyor...</p>
+    </div>
+</div>
+
+<py-script>
+# --- PYTHON KODU BAŞLANGIÇ ---
+
+# Kullanıcının Sağladığı İkilemler Listesi
+IKILEM_LISTESI = [
+    ("RECEP TAYYİP ERDOĞAN", "MELİH GÖKÇEK"),
+    ("Çay", "Kahve"),
+    ("Beşiktaş", "Fenerbahçe"),
+    ("Karadeniz", "Ege"),
+    ("iPhone", "Samsung"),
+    ("Yurt Dışında Yaşamak", "Türkiye'de Yaşamak"),
+    ("Barış Manço", "Sezen Aksu"),
+    ("Zeki Demirkubuz", "Nuri Bilge Ceylan"),
+    ("İlk mesajda 'Şizofren misin' yazmak", "Takipten çıkarılınca mesaj atmak"),
+]
+
+# AJANIN TERCİHLERİ
+AGENT_SECIMLERI = [
+    "RECEP TAYYİP ERDOĞAN",
+    "Çay",
+    "Beşiktaş",
+    "Karadeniz",
+    "Samsung",
+    "Türkiye'de Yaşamak",
+    "Barış Manço",
+    "Zeki Demirkubuz",
+    "İlk mesajda 'Şizofren misin' yazmak"
+]
+
+# Oyun Durumu
+mevcut_ikilem_indexi = 0
+oyuncu_secimleri = []
+game_area = Element("game_area")
+
+def display_ikilem(index):
+    """Mevcut ikilemi ekranda gösterir."""
+    if index >= len(IKILEM_LISTESI):
+        display_results()
+        return
+
+    secenek_1 = IKILEM_LISTESI[index][0]
+    secenek_2 = IKILEM_LISTESI[index][1]
+    
+    soru_metni = f"<h2>İkilem {index + 1}/{len(IKILEM_LISTESI)}: {secenek_1} mı, {secenek_2} mı?</h2>"
+    
+    # Seçeneklerin HTML'ini oluştur
+    button_1 = f'<button id="btn1" py-click="record_choice(\'{secenek_1}\')">{secenek_1}</button>'
+    button_2 = f'<button id="btn2" py-click="record_choice(\'{secenek_2}\')">{secenek_2}</button>'
+    
+    game_area.element.innerHTML = soru_metni + button_1 + button_2
+
+
+def record_choice(secim):
+    """Kullanıcının seçimini kaydeder ve bir sonraki ikileme geçer."""
+    global mevcut_ikilem_indexi
+    
+    # Seçimi kaydet
+    oyuncu_secimleri.append({
+        'index': mevcut_ikilem_indexi,
+        'cevap': secim
+    })
+    
+    mevcut_ikilem_indexi += 1
+    display_ikilem(mevcut_ikilem_indexi)
+
+
+def display_results():
+    """Tartışma odaklı final ekranını gösterir."""
+    
+    tartisma_konulari = []
+    uyum_sayisi = 0
+    
+    # Seçimleri Karşılaştır
+    for secim in oyuncu_secimleri:
+        agent_secimi = AGENT_SECIMLERI[secim['index']]
+        if secim['cevap'] == agent_secimi:
+            uyum_sayisi += 1
+        else:
+            # Uyumsuzluk durumunda tartışma konusunu kaydet
+            soru = IKILEM_LISTESI[secim['index']]
+            tartisma_konulari.append({
+                'soru': f"{soru[0]} vs {soru[1]}",
+                'senin': secim['cevap'],
+                'benim': agent_secimi
+            })
+            
+    # Sonuçların HTML'ini oluştur
+    if tartisma_konulari:
+        result_html = "<h2>Farklı Düşündüğümüz Konular (Tartışmaya Açık!):</h2>"
+        result_html += "<p>Hadi bu konuları konuşalım:</p>"
+        
+        for konu in tartisma_konulari:
+            result_html += f"""
+            <div class="result-item">
+                <p class="result-question">{konu['soru']}</p>
+                <p>Senin Seçimin: <span class="result-choice">{konu['senin']}</span></p>
+                <p>Benim Seçimim: <span class="result-choice">{konu['benim']}</span></p>
+            </div>
+            """
+        
+    else:
+        result_html = "<h2>Tebrikler! Her Konuda Anlaşıyoruz!</h2>"
+        result_html += "<p>Hiç tartışma konumuz yok. Mükemmel bir uyum!</p>"
+
+    
+    # Final Mesajı
+    final_message = f"<p style='margin-top:20px; color:#1abc9c; font-weight:bold;'>Toplam Uyum Sayımız: {uyum_sayisi} / {len(IKILEM_LISTESI)}</p>"
+    final_message += "<p style='margin-top:30px;'>Bu ekranın fotoğrafını çekip bana gönder. Hadi tartışmaya başlayalım! 😉</p>"
+    
+    game_area.element.innerHTML = result_html + final_message
+
+# Oyunu başlat
+display_ikilem(mevcut_ikilem_indexi)
+
+# --- PYTHON KODU SONUÇ ---
+</py-script>
+</body>
+</html>
